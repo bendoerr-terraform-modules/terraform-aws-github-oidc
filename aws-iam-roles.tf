@@ -1,6 +1,6 @@
 module "label_role" {
   source   = "bendoerr-terraform-modules/label/null"
-  version  = "1.0.0"
+  version  = "1.0.1"
   for_each = var.roles
   context  = var.context
   name     = each.key
