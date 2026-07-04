@@ -1,7 +1,8 @@
 # Thin caller -> reusable lint in bendoerr-terraform-modules/workflows (SHA-pinned, big-blast).
-# Full TF-module set. Baseline pins tflint_version v0.49.0 + the markdownlint_flags disable-set == reusable defaults -> pure defaults, no overrides.
-# egress uses reusable default (superset of this repo's set -> behavior-preserving). Lint isn't a
-# required check -> rename cosmetic; proof is the fidelity-diff vs this repo's last per-repo run.
+# Full TF-module set, reusable defaults except allowed-endpoints: the reusable's default egress
+# list omits proxy.golang.org/sum.golang.org, which golangci-lint needs on a cold module cache —
+# established repos coast on warm action caches, a fresh repo does not. List = reusable default
+# plus those two.
 name: Lint
 
 on:
@@ -20,3 +21,25 @@ jobs:
       contents: read
       pull-requests: write
     uses: bendoerr-terraform-modules/workflows/.github/workflows/lint.yml@1c9572cfd56a2aa0b7bd89afe37545ea4c310e40
+    with:
+      allowed-endpoints: >
+        api.github.com:443
+        check.trivy.dev:443
+        checkpoint-api.hashicorp.com:443
+        files.pythonhosted.org:443
+        ghcr.io:443
+        github.com:22
+        github.com:443
+        go.dev:443
+        golang.org:443
+        mirror.gcr.io:443
+        objects.githubusercontent.com:443
+        pkg-containers.githubusercontent.com:443
+        proxy.golang.org:443
+        pypi.org:443
+        raw.githubusercontent.com:443
+        registry.npmjs.org:443
+        release-assets.githubusercontent.com:443
+        releases.hashicorp.com:443
+        sum.golang.org:443
+        tuf-repo-cdn.sigstore.dev:443
