@@ -1,8 +1,8 @@
 # Thin caller -> reusable lint in bendoerr-terraform-modules/workflows (SHA-pinned, big-blast).
 # Full TF-module set, reusable defaults except allowed-endpoints: the reusable's default egress
-# list omits proxy.golang.org/sum.golang.org, which golangci-lint needs on a cold module cache —
-# established repos coast on warm action caches, a fresh repo does not. List = reusable default
-# plus those two.
+# list omits proxy.golang.org/sum.golang.org/storage.googleapis.com, which golangci-lint needs on
+# a cold module cache (module zips redirect from the proxy to GCS) — established repos coast on
+# warm action caches, a fresh repo does not. List = reusable default plus those three.
 name: Lint
 
 on:
@@ -41,5 +41,6 @@ jobs:
         registry.npmjs.org:443
         release-assets.githubusercontent.com:443
         releases.hashicorp.com:443
+        storage.googleapis.com:443
         sum.golang.org:443
         tuf-repo-cdn.sigstore.dev:443
