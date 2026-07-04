@@ -3,7 +3,6 @@ terraform {
   required_version = ">= 1.0.0"
 
   required_providers {
-    # Use a v5.x.x version of the AWS provider
     aws = {
       source  = "hashicorp/aws"
       version = "~> 6.10"
@@ -16,7 +15,31 @@ provider "aws" {
 }
 
 module "this" {
-  source  = "../.."
-  context = module.context.shared
-  name    = "example"
+  source          = "../.."
+  context         = module.context.shared
+  name            = "github-oidc"
+  create_provider = var.create_provider
+
+  roles = {
+    ci = {
+      repository = "bendoerr-terraform-modules/terraform-aws-github-oidc"
+      # Trust the default branch only. A 'pull_request' subject belongs on
+      # low-privilege roles exclusively — on a public repository it widens
+      # trust to workflows triggered from forks.
+      subjects    = ["ref:refs/heads/main"]
+      description = "Example CI role assumable from this repository's main branch."
+      inline_policies = {
+        describe-regions = data.aws_iam_policy_document.example.json
+      }
+    }
+  }
+}
+
+data "aws_iam_policy_document" "example" {
+  statement {
+    sid       = "Example"
+    effect    = "Allow"
+    actions   = ["ec2:DescribeRegions"]
+    resources = ["*"]
+  }
 }

@@ -1,6 +1,17 @@
-output "caller_identity" {
-  value       = data.aws_caller_identity.this.arn
-  description = "This can be removed if it is not needed"
+output "oidc_provider_arn" {
+  value       = local.oidc_provider_arn
+  description = "ARN of the GitHub Actions OIDC identity provider, whether created by this module or discovered in the account."
+}
+
+output "roles" {
+  value = {
+    for key, role in aws_iam_role.this : key => {
+      arn       = role.arn
+      name      = role.name
+      unique_id = role.unique_id
+    }
+  }
+  description = "Created IAM roles keyed by the input role key, each with its arn, name and unique_id."
 }
 
 output "id" {

@@ -16,6 +16,8 @@ import (
 )
 
 func TestDefaults(t *testing.T) {
+	ctx := context.Background()
+
 	// Setup terratest
 	rootFolder := "../"
 	terraformFolderRelativeToRoot := "examples/simple"
@@ -27,31 +29,49 @@ func TestDefaults(t *testing.T) {
 		Upgrade:      true,
 		NoColor:      os.Getenv("CI") == "true",
 		Vars: map[string]interface{}{
-			"namespace": strings.ToLower(random.UniqueId()),
+			"namespace": strings.ToLower(random.UniqueID()),
+			// The sandbox account already has the singleton GitHub OIDC
+			// provider, so exercise the lookup path instead of creating one.
+			"create_provider": false,
 		},
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
-	defer terraform.Destroy(t, terraformOptions)
+	defer terraform.DestroyContext(t, ctx, terraformOptions)
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
-	terraform.InitAndApply(t, terraformOptions)
+	terraform.InitAndApplyContext(t, ctx, terraformOptions)
 
 	// Print out the Terraform Output values
-	_, _ = pretty.Print(terraform.OutputAll(t, terraformOptions))
+	_, _ = pretty.Print(terraform.OutputAllContext(t, ctx, terraformOptions))
+
+	providerArn := terraform.OutputContext(t, ctx, terraformOptions, "oidc_provider_arn")
+	if !strings.Contains(providerArn, ":oidc-provider/token.actions.githubusercontent.com") {
+		t.Errorf("expected the GitHub OIDC provider ARN, got %q", providerArn)
+	}
+
+	roles := terraform.OutputMapOfObjectsContext(t, ctx, terraformOptions, "roles")
+	ciRole, ok := roles["ci"].(map[string]interface{})
+	if !ok {
+		t.Fatalf(
+			"expected a 'ci' role in the roles output%s",
+			makediff(map[string]interface{}{"ci": "role object"}, roles),
+		)
+	}
+	roleArn, _ := ciRole["arn"].(string)
+	if !strings.Contains(roleArn, ":role/") {
+		t.Errorf("expected an IAM role ARN for the 'ci' role, got %q", roleArn)
+	}
 
 	// AWS Session
 	_, err := config.LoadDefaultConfig(
-		context.Background(),
+		ctx,
 		config.WithRegion("us-east-1"),
 	)
 
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	// Force makediff usage
-	_ = makediff("example", "example")
 }
 
 func makediff(want interface{}, got interface{}) string {
