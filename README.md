@@ -105,25 +105,26 @@ and `permissions: id-token: write`.
 > naming pattern used across all modules.
 
 <!-- BEGIN_TF_DOCS -->
+
 ### Requirements
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.10 |
+| <a name="requirement_terraform"></a> [terraform](#requirement_terraform) | >= 1.0.0 |
+| <a name="requirement_aws"></a> [aws](#requirement_aws) | ~> 6.10 |
 
 ### Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.53.0 |
+| <a name="provider_aws"></a> [aws](#provider_aws) | ~> 6.10 |
 
 ### Modules
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
-| <a name="module_label"></a> [label](#module\_label) | bendoerr-terraform-modules/label/null | 1.0.0 |
-| <a name="module_label_role"></a> [label\_role](#module\_label\_role) | bendoerr-terraform-modules/label/null | 1.0.0 |
+| <a name="module_label"></a> [label](#module_label) | bendoerr-terraform-modules/label/null | 1.0.0 |
+| <a name="module_label_role"></a> [label_role](#module_label_role) | bendoerr-terraform-modules/label/null | 1.0.0 |
 
 ### Resources
 
@@ -140,21 +141,22 @@ and `permissions: id-token: write`.
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_context"></a> [context](#input\_context) | Shared context from the 'bendoerr-terraform-modules/terraform-null-context' module. | <pre>object({<br/>    attributes     = list(string)<br/>    dns_namespace  = string<br/>    environment    = string<br/>    instance       = string<br/>    instance_short = string<br/>    namespace      = string<br/>    region         = string<br/>    region_short   = string<br/>    role           = string<br/>    role_short     = string<br/>    project        = string<br/>    tags           = map(string)<br/>  })</pre> | n/a | yes |
-| <a name="input_create_provider"></a> [create\_provider](#input\_create\_provider) | Whether to create the GitHub Actions OIDC identity provider. AWS allows a single provider per URL per account, so set this to false when the account already has one and it will be discovered with a data source instead. | `bool` | `true` | no |
-| <a name="input_name"></a> [name](#input\_name) | A descriptive but short name used for labels by the 'bendoerr-terraform-modules/terraform-null-label' module. | `string` | `"github-oidc"` | no |
-| <a name="input_roles"></a> [roles](#input\_roles) | IAM roles assumable by GitHub Actions through the OIDC provider, keyed by a short<br/>name used for the role's label. Each role trusts a single GitHub 'repository'<br/>('owner/name') and a list of 'subjects' — subject suffixes appended to<br/>'repo:<repository>:' in the trust policy's StringLike condition, for example<br/>'ref:refs/heads/main', 'ref:refs/tags/v*', 'environment:production' or<br/>'pull\_request'. The default '*' trusts every workflow in the repository.<br/>Permissions come from 'policy\_arns' (attached managed policies) and<br/>'inline\_policies' (a map of policy name to JSON document). | <pre>map(object({<br/>    repository           = string<br/>    subjects             = optional(list(string), ["*"])<br/>    description          = optional(string)<br/>    policy_arns          = optional(list(string), [])<br/>    inline_policies      = optional(map(string), {})<br/>    max_session_duration = optional(number, 3600)<br/>    permissions_boundary = optional(string)<br/>    path                 = optional(string)<br/>  }))</pre> | `{}` | no |
-| <a name="input_thumbprint_list"></a> [thumbprint\_list](#input\_thumbprint\_list) | Server certificate thumbprints for the OIDC provider. AWS now validates GitHub's tokens against trusted root CAs and ignores these values, but the field is still required by the API. | `list(string)` | <pre>[<br/>  "6938fd4d98bab03faadb97b34396831e3780aea1",<br/>  "1c58a3a8518e8759bf075b76b750d4f2df264fcd"<br/>]</pre> | no |
+| <a name="input_context"></a> [context](#input_context) | Shared context from the 'bendoerr-terraform-modules/terraform-null-context' module. | <pre>object({<br/>    attributes     = list(string)<br/>    dns_namespace  = string<br/>    environment    = string<br/>    instance       = string<br/>    instance_short = string<br/>    namespace      = string<br/>    region         = string<br/>    region_short   = string<br/>    role           = string<br/>    role_short     = string<br/>    project        = string<br/>    tags           = map(string)<br/>  })</pre> | n/a | yes |
+| <a name="input_create_provider"></a> [create_provider](#input_create_provider) | Whether to create the GitHub Actions OIDC identity provider. AWS allows a single provider per URL per account, so set this to false when the account already has one and it will be discovered with a data source instead. | `bool` | `true` | no |
+| <a name="input_name"></a> [name](#input_name) | A descriptive but short name used for labels by the 'bendoerr-terraform-modules/terraform-null-label' module. | `string` | `"github-oidc"` | no |
+| <a name="input_roles"></a> [roles](#input_roles) | IAM roles assumable by GitHub Actions through the OIDC provider, keyed by a short<br/>name used for the role's label. Each role trusts a single GitHub 'repository'<br/>('owner/name') and a list of 'subjects' — subject suffixes appended to<br/>'repo:<repository>:' in the trust policy's StringLike condition, for example<br/>'ref:refs/heads/main', 'ref:refs/tags/v\*', 'environment:production' or<br/>'pull_request'. The default '*' trusts every workflow in the repository.<br/>Permissions come from 'policy_arns' (attached managed policies) and<br/>'inline_policies' (a map of policy name to JSON document). | <pre>map(object({<br/>    repository           = string<br/>    subjects             = optional(list(string), \["*"\])<br/>    description          = optional(string)<br/>    policy_arns          = optional(list(string), \[\])<br/>    inline_policies      = optional(map(string), {})<br/>    max_session_duration = optional(number, 3600)<br/>    permissions_boundary = optional(string)<br/>    path                 = optional(string)<br/>  }))</pre> | `{}` | no |
+| <a name="input_thumbprint_list"></a> [thumbprint_list](#input_thumbprint_list) | Server certificate thumbprints for the OIDC provider. AWS now validates GitHub's tokens against trusted root CAs and ignores these values, but the field is still required by the API. | `list(string)` | <pre>\[<br/>  "6938fd4d98bab03faadb97b34396831e3780aea1",<br/>  "1c58a3a8518e8759bf075b76b750d4f2df264fcd"<br/>\]</pre> | no |
 
 ### Outputs
 
 | Name | Description |
 | ---- | ----------- |
-| <a name="output_id"></a> [id](#output\_id) | The normalized ID from the 'bendoerr-terraform-modules/terraform-null-label' module. |
-| <a name="output_name"></a> [name](#output\_name) | The provided name given to the module. |
-| <a name="output_oidc_provider_arn"></a> [oidc\_provider\_arn](#output\_oidc\_provider\_arn) | ARN of the GitHub Actions OIDC identity provider, whether created by this module or discovered in the account. |
-| <a name="output_roles"></a> [roles](#output\_roles) | Created IAM roles keyed by the input role key, each with its arn, name and unique\_id. |
-| <a name="output_tags"></a> [tags](#output\_tags) | The normalized tags from the 'bendoerr-terraform-modules/terraform-null-label' module. |
+| <a name="output_id"></a> [id](#output_id) | The normalized ID from the 'bendoerr-terraform-modules/terraform-null-label' module. |
+| <a name="output_name"></a> [name](#output_name) | The provided name given to the module. |
+| <a name="output_oidc_provider_arn"></a> [oidc_provider_arn](#output_oidc_provider_arn) | ARN of the GitHub Actions OIDC identity provider, whether created by this module or discovered in the account. |
+| <a name="output_roles"></a> [roles](#output_roles) | Created IAM roles keyed by the input role key, each with its arn, name and unique_id. |
+| <a name="output_tags"></a> [tags](#output_tags) | The normalized tags from the 'bendoerr-terraform-modules/terraform-null-label' module. |
+
 <!-- END_TF_DOCS -->
 
 ## Roadmap
