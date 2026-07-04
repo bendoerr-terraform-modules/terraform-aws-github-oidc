@@ -1,0 +1,22 @@
+# Thin caller -> reusable lint in bendoerr-terraform-modules/workflows (SHA-pinned, big-blast).
+# Full TF-module set. Baseline pins tflint_version v0.49.0 + the markdownlint_flags disable-set == reusable defaults -> pure defaults, no overrides.
+# egress uses reusable default (superset of this repo's set -> behavior-preserving). Lint isn't a
+# required check -> rename cosmetic; proof is the fidelity-diff vs this repo's last per-repo run.
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: bendoerr-terraform-modules/workflows/.github/workflows/lint.yml@1c9572cfd56a2aa0b7bd89afe37545ea4c310e40
