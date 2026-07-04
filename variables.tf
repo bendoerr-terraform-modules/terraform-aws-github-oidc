@@ -65,4 +65,14 @@ variable "roles" {
     condition     = alltrue([for role in var.roles : can(regex("^[^/]+/[^/]+$", role.repository))])
     error_message = "Each role's repository must be in 'owner/name' format."
   }
+
+  validation {
+    condition     = alltrue([for role in var.roles : length(role.subjects) > 0])
+    error_message = "Each role's subjects list must contain at least one entry; an empty list would render a trust policy with no subject condition values."
+  }
+
+  validation {
+    condition     = alltrue([for role in var.roles : role.max_session_duration >= 3600 && role.max_session_duration <= 43200])
+    error_message = "Each role's max_session_duration must be between 3600 and 43200 seconds."
+  }
 }

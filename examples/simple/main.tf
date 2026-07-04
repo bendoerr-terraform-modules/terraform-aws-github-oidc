@@ -22,9 +22,12 @@ module "this" {
 
   roles = {
     ci = {
-      repository  = "bendoerr-terraform-modules/terraform-aws-github-oidc"
-      subjects    = ["ref:refs/heads/main", "pull_request"]
-      description = "Example CI role assumable from this repository's main branch and pull requests."
+      repository = "bendoerr-terraform-modules/terraform-aws-github-oidc"
+      # Trust the default branch only. A 'pull_request' subject belongs on
+      # low-privilege roles exclusively — on a public repository it widens
+      # trust to workflows triggered from forks.
+      subjects    = ["ref:refs/heads/main"]
+      description = "Example CI role assumable from this repository's main branch."
       inline_policies = {
         describe-regions = data.aws_iam_policy_document.example.json
       }
