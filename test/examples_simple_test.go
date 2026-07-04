@@ -28,6 +28,9 @@ func TestDefaults(t *testing.T) {
 		NoColor:      os.Getenv("CI") == "true",
 		Vars: map[string]interface{}{
 			"namespace": strings.ToLower(random.UniqueId()),
+			// The sandbox account already has the singleton GitHub OIDC
+			// provider, so exercise the lookup path instead of creating one.
+			"create_provider": false,
 		},
 	}
 
@@ -40,6 +43,21 @@ func TestDefaults(t *testing.T) {
 	// Print out the Terraform Output values
 	_, _ = pretty.Print(terraform.OutputAll(t, terraformOptions))
 
+	providerArn := terraform.Output(t, terraformOptions, "oidc_provider_arn")
+	if !strings.Contains(providerArn, ":oidc-provider/token.actions.githubusercontent.com") {
+		t.Errorf("expected the GitHub OIDC provider ARN, got %q", providerArn)
+	}
+
+	roles := terraform.OutputMapOfObjects(t, terraformOptions, "roles")
+	ciRole, ok := roles["ci"].(map[string]interface{})
+	if !ok {
+		t.Fatalf("expected a 'ci' role in the roles output%s", makediff(map[string]interface{}{"ci": "role object"}, roles))
+	}
+	roleArn, _ := ciRole["arn"].(string)
+	if !strings.Contains(roleArn, ":role/") {
+		t.Errorf("expected an IAM role ARN for the 'ci' role, got %q", roleArn)
+	}
+
 	// AWS Session
 	_, err := config.LoadDefaultConfig(
 		context.Background(),
@@ -49,9 +67,6 @@ func TestDefaults(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	// Force makediff usage
-	_ = makediff("example", "example")
 }
 
 func makediff(want interface{}, got interface{}) string {

@@ -1,6 +1,11 @@
-output "caller_identity" {
-  value       = module.this.caller_identity
-  description = "An example output value."
+output "oidc_provider_arn" {
+  value       = module.this.oidc_provider_arn
+  description = "ARN of the GitHub Actions OIDC identity provider."
+}
+
+output "roles" {
+  value       = module.this.roles
+  description = "Created IAM roles keyed by the input role key."
 }
 
 output "id" {

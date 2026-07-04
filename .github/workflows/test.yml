@@ -24,27 +24,7 @@ jobs:
         with:
           egress-policy: block
           allowed-endpoints: >
-            *.bendoerr.com:443
-            *.cloudfront.net:443
-            *.execute-api.us-east-1.amazonaws.com:443
-            *.s3.amazonaws.com:443
-            *.s3.us-east-1.amazonaws.com:443
-            234656776442.ddb.us-east-1.amazonaws.com:443
-            234656776442.s3-control.us-east-1.amazonaws.com:443
-            acm.us-east-1.amazonaws.com:443
-            apigateway.us-east-1.amazonaws.com:443
-            budgets.amazonaws.com:443
             checkpoint-api.hashicorp.com:443
-            cloudfront.amazonaws.com:443
-            cognito-idp.us-east-1.amazonaws.com:443
-            discord.com:443
-            dynamodb.us-east-1.amazonaws.com:443
-            ec2.us-east-1.amazonaws.com:443
-            ec2.us-west-2.amazonaws.com:443
-            ecs.us-east-1.amazonaws.com:443
-            ecs.us-west-2.amazonaws.com:443
-            elasticfilesystem.us-east-1.amazonaws.com:443
-            gateway.discord.gg:443
             github.com:22
             github.com:443
             go.dev:443
@@ -52,22 +32,13 @@ jobs:
             hosted-compute-watchdog-prod-eus-01.githubapp.com:443
             hosted-compute-watchdog-prod-iad-01.githubapp.com:443
             iam.amazonaws.com:443
-            keybase.io:443
-            kms.us-east-1.amazonaws.com:443
-            kms.us-west-2.amazonaws.com:443
-            lambda.us-east-1.amazonaws.com:443
-            logs.us-east-1.amazonaws.com:443
             objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
             proxy.golang.org:443
-            registry.npmjs.org:443
             registry.terraform.io:443
             releases.hashicorp.com:443
-            route53.amazonaws.com:443
-            s3.amazonaws.com:443
-            sns.us-east-1.amazonaws.com:443
             storage.googleapis.com:443
             sts.us-east-1.amazonaws.com:443
-            sts.us-west-2.amazonaws.com:443
             sum.golang.org:443
 
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -83,25 +54,11 @@ jobs:
 
       - uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b # v6.2.0
         with:
-          role-to-assume: ${{ vars.CORE_APPLY_ROLE }}
-          aws-region: us-east-1
-
-      - run: |
-          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile core-profile
-          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile core-profile
-          aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile core-profile
-
-      - uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b # v6.2.0
-        with:
           role-to-assume: ${{ vars.SANDBOX_APPLY_ROLE }}
           aws-region: us-east-1
 
       - shell: bash
         working-directory: test
-        env:
-          TF_VAR_route53_profile: core-profile
-          TF_VAR_route53_zone_id: ${{ secrets.CORE_HOSTED_ZONE_ID }}
-          TF_VAR_route53_zone_name: ${{ secrets.CORE_HOSTED_ZONE_NAME }}
         run: |
           go install github.com/jstemmer/go-junit-report@latest
           go test -timeout 20m -v ./... | tee report.txt
